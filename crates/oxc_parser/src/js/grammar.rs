@@ -97,9 +97,10 @@ impl<'a, C: Config> CoverGrammar<'a, ArrayExpression<'a>, C> for ArrayAssignment
     // would otherwise carry this body's large stack frame + callee-saved spills on every call.
     #[inline(never)]
     fn cover(expr: ArrayExpression<'a>, p: &mut ParserImpl<'a, C>) -> Self {
-        // Comments may be assigned to elements discarded by the conversion.
+        // Comments may be assigned to elements discarded by the conversion. Calls and functions
+        // are moved to the target, so annotation comments keep their owners.
         if p.assigned_comments != 0 {
-            p.unassign_comments(expr.span);
+            p.unassign_comments_keeping_annotations(expr.span);
         }
         let len = expr.elements.len();
         let mut elements = ArenaVec::with_capacity_in(len, p);
@@ -178,9 +179,10 @@ impl<'a, C: Config> CoverGrammar<'a, ObjectExpression<'a>, C> for ObjectAssignme
     // inlining this large body into the hot `AssignmentTarget::cover` dispatcher.
     #[inline(never)]
     fn cover(expr: ObjectExpression<'a>, p: &mut ParserImpl<'a, C>) -> Self {
-        // Comments may be assigned to elements discarded by the conversion.
+        // Comments may be assigned to elements discarded by the conversion. Calls and functions
+        // are moved to the target, so annotation comments keep their owners.
         if p.assigned_comments != 0 {
-            p.unassign_comments(expr.span);
+            p.unassign_comments_keeping_annotations(expr.span);
         }
         let len = expr.properties.len();
         let mut properties = ArenaVec::with_capacity_in(len, p);

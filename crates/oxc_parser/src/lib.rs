@@ -95,7 +95,7 @@ use oxc_ast::{
     builder::{AstBuilder, GetAstBuilder},
 };
 use oxc_diagnostics::Diagnostics;
-use oxc_span::{SourceType, Span};
+use oxc_span::{GetSpan, SourceType, Span};
 use oxc_syntax::module_record::ModuleRecord;
 
 pub use crate::lexer::{Kind, Token};
@@ -907,11 +907,18 @@ impl<'a, C: ParserConfig> ParserImpl<'a, C> {
         );
         // Comments after the first reparsed statement may be owned by replaced nodes. Unassign
         // them once rather than on each rewind, and assign those not owned by reparsed statements
-        // by walking Program.
+        // by walking Program. Annotation comments are assigned to the calls and functions they
+        // apply to while parsing, so keep them, and unassign those in each statement before it is
+        // reparsed.
         if let Some((_, checkpoint)) = checkpoints.first() {
-            self.unassign_comments(Span::new(checkpoint.prev_token_end(), u32::MAX));
+            self.unassign_comments_keeping_annotations(Span::new(
+                checkpoint.prev_token_end(),
+                u32::MAX,
+            ));
         }
         for (stmt_index, checkpoint) in checkpoints {
+            let end = statements.get(stmt_index).map_or(u32::MAX, |stmt| stmt.span().end);
+            self.unassign_comments(Span::new(checkpoint.prev_token_end(), end));
             self.rewind_keeping_comments(checkpoint);
             let replacement_start = replacements.len();
 
@@ -1034,7 +1041,6 @@ impl<'a, C: ParserConfig> ParserImpl<'a, C> {
     }
 
     fn check_unfinished_errors(&mut self) {
-        use oxc_span::GetSpan;
         // PropertyDefinition : cover_initialized_name
         // It is a Syntax Error if any source text is matched by this production.
         for expr in self.state.cover_initialized_name.values() {
