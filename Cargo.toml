@@ -301,7 +301,7 @@ ignored = [
 [patch.crates-io]
 oxc_allocator = { path = "crates/oxc_allocator" }
 # Unpublished; switch to the registry release once published.
-oxc-htmlish-parser = { git = "https://github.com/oxc-project/oxc-htmlish-parser", rev = "db5a95c11d3eee3ae305101b1af3b8d56db67da2" }
+oxc-htmlish-parser = { git = "https://github.com/oxc-project/oxc-htmlish-parser", rev = "afaa562f6452c43497d85d55a22bc2e45ee097d3" }
 
 [profile.dev]
 # Disabling debug info speeds up local and CI builds,
