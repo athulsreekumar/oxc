@@ -1001,9 +1001,7 @@ impl<'a, C: Config> ParserImpl<'a, C> {
         let start = self.cur_start();
         let is_rest_type = self.eat(Kind::Dot3);
 
-        if self.cur_kind().is_identifier_name()
-            && self.lookahead(Self::is_next_token_colon_or_question_colon)
-        {
+        if self.cur_kind().is_identifier_name() && self.is_tuple_element_name() {
             let member_start = self.cur_start();
             let label = self.parse_identifier_name();
             let optional = self.eat(Kind::Question);
@@ -1045,6 +1043,16 @@ impl<'a, C: Config> ParserImpl<'a, C> {
             } else {
                 self.convert_type_to_tuple_element(ty)
             }
+        }
+    }
+
+    fn is_tuple_element_name(&mut self) -> bool {
+        // These punctuation bytes unambiguously determine whether the current name is
+        // a tuple label. Leave comments, non-ASCII whitespace and `?:` to the lexer.
+        match self.lexer.remaining().trim_ascii_start().as_bytes().first() {
+            Some(b':') => true,
+            Some(b',' | b']' | b'[' | b'>' | b'|' | b'&' | b'.' | b';') => false,
+            _ => self.lookahead(Self::is_next_token_colon_or_question_colon),
         }
     }
 
