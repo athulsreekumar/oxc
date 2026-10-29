@@ -1706,7 +1706,7 @@ dependencies = [
 [[package]]
 name = "oxc-htmlish-parser"
 version = "0.0.0"
-source = "git+https://github.com/oxc-project/oxc-htmlish-parser?rev=f39eda3e72a17f9f89964d70c7787a0ef31100e3#f39eda3e72a17f9f89964d70c7787a0ef31100e3"
+source = "git+https://github.com/oxc-project/oxc-htmlish-parser?rev=db5a95c11d3eee3ae305101b1af3b8d56db67da2#db5a95c11d3eee3ae305101b1af3b8d56db67da2"
 dependencies = [
  "memchr",
  "oxc_allocator",

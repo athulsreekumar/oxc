@@ -125,8 +125,8 @@ fn write_node<'a>(t: &'a Tree<'a>, id: NodeId, f: &mut HtmlishFormatter<'_, 'a>)
             write_closing_tag_end(t, id, f);
         }
         // Comments are printed as written,
-        // a `</ div>` too (DIVERGENCES.md#end-tag-with-space-is-comment).
-        NodeKind::Comment(_) => write!(
+        // a `</ div>` too (DIVERGENCES.md#end-tag-with-space-is-comment), and an omitted element's end tag (`</body>`).
+        NodeKind::Comment(_) | NodeKind::EndTag(_) => write!(
             f,
             [
                 opening_tag_prefix(t, id),
